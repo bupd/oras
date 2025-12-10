@@ -182,3 +182,63 @@ func TestTTYCopyHandler_PreCopy(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestTTYBackupHandler_StartTracking(t *testing.T) {
+	_, child, err := testutils.NewPty()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = child.Close() }()
+	bh := NewTTYBackupHandler(child, mockFetcher.Fetcher)
+	gt := memory.New()
+	tracked, err := bh.StartTracking(gt)
+	if err != nil {
+		t.Fatalf("StartTracking() should not return an error: %v", err)
+	}
+	if tracked == nil {
+		t.Fatal("StartTracking() should return a tracked target")
+	}
+	if err = bh.StopTracking(); err != nil {
+		t.Fatalf("StopTracking() should not return an error: %v", err)
+	}
+}
+
+func TestTTYRestoreHandler_StartTracking(t *testing.T) {
+	_, child, err := testutils.NewPty()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = child.Close() }()
+	rh := NewTTYRestoreHandler(child, mockFetcher.Fetcher)
+	gt := memory.New()
+	tracked, err := rh.StartTracking(gt)
+	if err != nil {
+		t.Fatalf("StartTracking() should not return an error: %v", err)
+	}
+	if tracked == nil {
+		t.Fatal("StartTracking() should return a tracked target")
+	}
+	if err = rh.StopTracking(); err != nil {
+		t.Fatalf("StopTracking() should not return an error: %v", err)
+	}
+}
+
+func TestTTYBlobPushHandler_StartTracking(t *testing.T) {
+	_, child, err := testutils.NewPty()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = child.Close() }()
+	bph := NewTTYBlobPushHandler(child, mockFetcher.ImageLayer)
+	gt := memory.New()
+	tracked, err := bph.StartTracking(gt)
+	if err != nil {
+		t.Fatalf("StartTracking() should not return an error: %v", err)
+	}
+	if tracked == nil {
+		t.Fatal("StartTracking() should return a tracked target")
+	}
+	if err = bph.StopTracking(); err != nil {
+		t.Fatalf("StopTracking() should not return an error: %v", err)
+	}
+}
